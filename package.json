@@ -1,0 +1,9 @@
+{
+  "name": "ieee-ras-vitc-rag-assistant",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vercel dev"
+  }
+}

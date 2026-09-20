@@ -1,0 +1,474 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#050913" />
+  <meta name="description" content="RAG-powered IEEE Robotics and Automation Society assistant for VIT Chennai." />
+  <title>VSURAS · IEEE RAS VIT Chennai</title>
+  <style>
+    :root {
+      --bg: #050913;
+      --panel: rgba(10, 18, 34, .72);
+      --panel-2: rgba(14, 27, 49, .78);
+      --line: rgba(98, 187, 255, .17);
+      --line-strong: rgba(98, 187, 255, .34);
+      --text: #ecf8ff;
+      --muted: #91a9bc;
+      --blue: #ecf0f3;
+      --cyan: #58f0dc;
+      --violet: #a09dac;
+      --green: #6ef3a5;
+      --danger: #f3eaeb;
+      --shadow: 0 30px 90px rgba(0, 0, 0, .42);
+      --radius: 22px;
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      color: var(--text);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background:
+        radial-gradient(circle at 16% 12%, rgba(36, 115, 255, .16), transparent 28%),
+        radial-gradient(circle at 84% 0%, rgba(105, 74, 255, .13), transparent 24%),
+        radial-gradient(circle at 50% 100%, rgba(39, 222, 205, .10), transparent 30%),
+        var(--bg);
+      overflow-x: hidden;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      opacity: .45;
+      background-image:
+        linear-gradient(rgba(80, 168, 255, .045) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(80, 168, 255, .045) 1px, transparent 1px);
+      background-size: 42px 42px;
+      mask-image: linear-gradient(to bottom, black, transparent 86%);
+    }
+
+    .orb {
+      position: fixed;
+      width: 420px;
+      height: 420px;
+      border-radius: 50%;
+      filter: blur(80px);
+      pointer-events: none;
+      opacity: .12;
+      animation: drift 12s ease-in-out infinite alternate;
+    }
+    .orb.one { background: #8eb2d5; left: -180px; top: 18%; }
+    .orb.two { background: #373737; right: -200px; top: 35%; animation-delay: -4s; }
+    @keyframes drift { to { transform: translate3d(50px, -35px, 0) scale(1.08); } }
+
+    a { color: inherit; }
+    button, input { font: inherit; }
+
+    .shell { width: min(1180px, calc(100% - 28px)); margin: 0 auto; position: relative; z-index: 1; }
+
+    nav {
+      height: 78px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid rgba(255,255,255,.055);
+    }
+
+    .brand { display: flex; align-items: center; gap: 12px; font-weight: 800; letter-spacing: -.02em; }
+    .mark {
+      width: 38px; height: 38px; border-radius: 12px;
+      display: grid; place-items: center;
+      border: 1px solid var(--line-strong);
+      background: linear-gradient(145deg, rgba(84, 183, 255, .2), rgba(113, 83, 255, .10));
+      box-shadow: inset 0 0 20px rgba(84, 183, 255, .09), 0 10px 35px rgba(42, 143, 255, .15);
+    }
+    .mark svg { width: 24px; height: 24px; }
+    .brand small { display: block; color: var(--muted); font-size: 10px; letter-spacing: .16em; text-transform: uppercase; margin-top: 2px; }
+
+    .nav-pill {
+      display: flex; align-items: center; gap: 8px;
+      font-size: 12px; color: #c1c8cd;
+      padding: 12px 12px; border: 3px solid var(--line); border-radius: 100px;
+      background: rgba(44, 46, 48, 0.6);
+    }
+    .dot { width: 7px; height: 7px; border-radius: 30%; background: var(--white); box-shadow: 0 0 16px var(--white); }
+
+    .hero { padding: 76px 0 42px; text-align: center; }
+    .eyebrow {
+      display: inline-flex; gap: 8px; align-items: center;
+      padding: 8px 12px; border: 1px solid var(--line); border-radius: 999px;
+      color: #afb0b1; background: rgba(39, 40, 42, 0.52); font-size: 12px;
+    }
+    .hero h1 {
+      margin: 20px auto 14px;
+      max-width: 800px;
+      font-size: clamp(42px, 7vw, 84px);
+      line-height: .98;
+      letter-spacing: -.055em;
+      font-weight: 850;
+    }
+    .gradient {
+      background: linear-gradient(80deg, #fff 4%, #52c2ff 47%, #a19bd4 86%);
+      -webkit-background-clip: text; background-clip: text; color: transparent;
+    }
+    .hero p { margin: 0 auto; max-width: 720px; color: var(--muted); font-size: 16px; line-height: 1.75; }
+
+    .pipeline {
+      margin: 26px auto 0;
+      display: flex; justify-content: center; align-items: center; flex-wrap: wrap; gap: 9px;
+      color: #f2faff; font-size: 11px; letter-spacing: 1px; text-transform: uppercase;
+    }
+    .pipeline span { border: 1px solid var(--line); background: rgba(7, 7, 7, 0.55); padding: 8px 10px; border-radius: 9px; }
+    .pipeline i { color: var(--white); font-style: normal; }
+
+    .workspace {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 310px;
+      gap: 18px;
+      padding-bottom: 56px;
+    }
+
+    .glass {
+      border: 1px solid var(--line);
+      background: linear-gradient(180deg, rgba(13, 24, 44, .82), rgba(7, 14, 27, .72));
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(18px);
+      border-radius: var(--radius);
+    }
+
+    .chat { min-height: 650px; display: flex; flex-direction: column; overflow: hidden; }
+    .chat-head {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 18px 20px; border-bottom: 1px solid var(--line);
+    }
+    .chat-head strong { font-size: 13px; }
+    .chat-head span { color: var(--muted); font-size: 11px; }
+    .mode { display: flex; gap: 7px; align-items: center; }
+    .mode b { width: 7px; height: 7px; border-radius: 50%; background: var(--black); box-shadow: 0 0 14px var(--cyan); }
+
+    .messages {
+      flex: 1;
+      padding: 22px;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+      overflow-y: auto;
+      max-height: 600px;
+      scrollbar-width: thin;
+      scrollbar-color: rgba(86, 184, 255, .28) transparent;
+    }
+
+    .message { display: flex; gap: 10px; max-width: 88%; animation: rise .28s ease both; }
+    .message.user { margin-left: auto; flex-direction: row-reverse; }
+    @keyframes rise { from { opacity: 0; transform: translateY(7px); } }
+    .avatar {
+      flex: 0 0 30px; height: 30px; border-radius: 10px;
+      display: grid; place-items: center; font-size: 11px; font-weight: 800;
+      border: 1px solid var(--line-strong); background: rgba(58, 164, 255, .10);
+    }
+    .user .avatar { background: rgba(137, 113, 255, .11); border-color: rgba(151, 123, 255, .27); }
+    .bubble {
+      padding: 13px 15px;
+      border-radius: 5px 17px 17px 17px;
+      border: 1px solid var(--line);
+      background: rgba(9, 18, 33, .86);
+      color: #d9e9f3;
+      font-size: 13px;
+      line-height: 1.65;
+      white-space: pre-wrap;
+      overflow-wrap: anywhere;
+    }
+    .user .bubble {
+      border-radius: 17px 5px 17px 17px;
+      background: linear-gradient(135deg, rgba(48, 126, 213, .20), rgba(96, 73, 189, .18));
+    }
+
+    .source-wrap { margin-top: 10px; display: grid; gap: 7px; }
+    .source-card {
+      display: flex; align-items: center; gap: 10px;
+      text-decoration: none;
+      padding: 9px 10px; border-radius: 11px;
+      border: 1px solid rgba(95, 182, 255, .14);
+      background: rgba(7, 17, 31, .66);
+      transition: .2s ease;
+    }
+    .source-card:hover { transform: translateY(-1px); border-color: rgba(95, 182, 255, .34); background: rgba(14, 32, 55, .8); }
+    .source-id { color: var(--cyan); font-size: 10px; font-weight: 800; }
+    .source-copy { min-width: 0; }
+    .source-copy strong { display: block; font-size: 11px; color: #d6e9f5; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .source-copy small { color: #748ea1; font-size: 9px; }
+    .trace {
+      margin-top: 9px; color: #718a9c; font-size: 10px;
+    }
+
+    .typing { display: inline-flex; gap: 4px; align-items: center; min-width: 50px; }
+    .typing i { width: 5px; height: 5px; background: #8bcfff; border-radius: 50%; animation: bounce 1s infinite ease-in-out; }
+    .typing i:nth-child(2) { animation-delay: .12s; }
+    .typing i:nth-child(3) { animation-delay: .24s; }
+    @keyframes bounce { 0%, 60%, 100% { transform: translateY(0); opacity: .4; } 30% { transform: translateY(-4px); opacity: 1; } }
+
+    .composer { padding: 15px; border-top: 1px solid var(--line); background: rgba(4, 10, 20, .52); }
+    .input-row { display: flex; align-items: center; gap: 9px; padding: 7px 7px 7px 14px; border: 1px solid var(--line-strong); border-radius: 15px; background: rgba(5, 12, 23, .82); box-shadow: inset 0 0 20px rgba(71, 158, 255, .03); }
+    .input-row:focus-within { border-color: rgba(82, 191, 255, .58); box-shadow: 0 0 0 3px rgba(70, 172, 255, .08); }
+    input { flex: 1; border: 0; outline: 0; background: transparent; color: white; min-width: 0; font-size: 13px; }
+    input::placeholder { color: #607889; }
+    .send {
+      border: 0; cursor: pointer; color: #021019; font-weight: 850;
+      padding: 10px 14px; border-radius: 11px;
+      background: linear-gradient(135deg, #70d6ff, #65efd6);
+      box-shadow: 0 8px 25px rgba(86, 215, 231, .18);
+    }
+    .send:disabled { opacity: .45; cursor: not-allowed; }
+    .hint { margin: 8px 3px 0; color: #566f81; font-size: 9px; }
+
+    aside { display: flex; flex-direction: column; gap: 14px; }
+    .side-card { padding: 18px; }
+    .side-card h3 { margin: 0 0 5px; font-size: 12px; letter-spacing: .05em; text-transform: uppercase; color: #cfe7f5; }
+    .side-card > p { margin: 0; color: #718b9d; font-size: 11px; line-height: 1.55; }
+
+    .flow { margin-top: 15px; display: grid; gap: 8px; }
+    .flow-step { position: relative; display: flex; align-items: flex-start; gap: 10px; padding: 11px; border-radius: 13px; background: rgba(5, 13, 25, .68); border: 1px solid rgba(98, 187, 255, .12); }
+    .num { flex: 0 0 24px; height: 24px; border-radius: 8px; display: grid; place-items: center; color: #e5e9eb; background: rgba(44, 46, 47, 0.1); border: 1px solid rgba(237, 239, 240, 0.18); font-size: 10px; font-weight: 800; }
+    .flow-step strong { display: block; font-size: 11px; margin-bottom: 2px; }
+    .flow-step small { display: block; color: #6e8799; font-size: 9px; line-height: 1.45; }
+
+    .chips { display: grid; gap: 8px; margin-top: 13px; }
+    .chip {
+      text-align: left; cursor: pointer; border: 1px solid rgba(98, 187, 255, .13); color: #9cb5c6;
+      background: rgba(5, 13, 25, .58); padding: 10px 11px; border-radius: 11px; font-size: 10px; line-height: 1.4;
+      transition: .2s ease;
+    }
+    .chip:hover { color: white; border-color: rgba(98, 187, 255, .35); transform: translateX(2px); }
+
+    .kb-stat { margin-top: 14px; display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    .stat { padding: 12px; border-radius: 12px; background: rgba(5, 13, 25, .6); border: 1px solid rgba(98, 187, 255, .11); }
+    .stat b { display: block; font-size: 20px; letter-spacing: -.04em; color: #dff6ff; }
+    .stat span { display: block; font-size: 8px; color: #667f91; text-transform: uppercase; letter-spacing: .08em; margin-top: 2px; }
+
+    footer { padding: 2px 0 38px; color: #536b7a; font-size: 10px; text-align: center; }
+    footer a { color: #7aa5bd; text-decoration: none; }
+
+    @media (max-width: 900px) {
+      .workspace { grid-template-columns: 1fr; }
+      aside { display: grid; grid-template-columns: 1fr 1fr; }
+      .hero { padding-top: 54px; }
+    }
+    @media (max-width: 620px) {
+      .shell { width: min(100% - 18px, 1180px); }
+      nav { height: 68px; }
+      .nav-pill span:last-child { display: none; }
+      .hero { padding: 46px 4px 32px; }
+      .hero p { font-size: 13px; }
+      .pipeline { gap: 5px; }
+      .pipeline span { font-size: 9px; padding: 7px 8px; }
+      .chat { min-height: 620px; }
+      .messages { padding: 16px; max-height: 560px; }
+      .message { max-width: 96%; }
+      aside { grid-template-columns: 1fr; }
+      .side-card:last-child { display: none; }
+    }
+  </style>
+</head>
+<body>
+  <div class="orb one"></div>
+  <div class="orb two"></div>
+
+  <div class="shell">
+    <nav>
+      <div class="brand">
+        <div class="mark" aria-hidden="true">
+          
+          <p>V</p>
+        </div>
+        <div>VSURAS<small>IEEE RAS </small></div>
+      </div>
+      <div class="nav-pill"><span class="dot"></span><span>RAG system online</span></div>
+    </nav>
+
+    <section class="hero">
+      <div class="eyebrow"> public IEEE + crazy info bro</div>
+      <h1><span class="gradient">ROBO KNOWLEDGE .</span><br />Retrieved, then answered.</h1>
+      <p>HAVE QUERIES ? Ask about IEEE RAS at VIT Chennai, its purpose, the IEEE student ecosystem, HackVerse 2026, or historical robotics activities. RASBot retrieves relevant sources before the model writes an answer.</p>
+      <div class="pipeline" aria-label="RAG pipeline">
+        <span>Question</span><i>→</i><span>Retrieve</span><i>→</i><span>Ground Context</span><i>→</i><span>LLM</span><i>→</i><span>Cited Answer</span>
+      </div>
+    </section>
+
+    <main class="workspace">
+      <section class="chat glass">
+        <div class="chat-head">
+          <div><strong>RAS Knowledge Assistant</strong><br></div>
+          <div class="mode"><b></b><span id="modeLabel">Ready</span></div>
+        </div>
+
+        <div class="messages" id="messages" aria-live="polite">
+          <div class="message bot">
+            <div class="avatar">R</div>
+            <div>
+              <div class="bubble">Hi — I’m RASBot. I answer using a small verified knowledge base about IEEE RAS and the IEEE ecosystem at VIT Chennai. Ask me what IEEE RAS does, about HackVerse 2026, or how this RAG prototype works.</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="composer">
+          <form class="input-row" id="chatForm">
+            <input id="question" autocomplete="off" maxlength="1500" placeholder="Ask something about IEEE RAS VIT Chennai…" aria-label="Question" />
+            <button class="send" id="sendBtn" type="submit">Ask ↗</button>
+          </form>
+          
+        </div>
+      </section>
+
+      <aside>
+        <section class="side-card glass">
+          <h3>wHAT IS THERE!!! Inside the RAG</h3>
+    
+          <div class="flow">
+            <div class="flow-step"><div class="num">01</div><div><strong>Knowledge base</strong><small>Short verified records + source URLs live in data/knowledge.js.</small></div></div>
+            <div class="flow-step"><div class="num">02</div><div><strong>Retriever</strong><small>The API ranks records with BM25-style keyword relevance.</small></div></div>
+            <div class="flow-step"><div class="num">03</div><div><strong>Grounded prompt</strong><small>Only the best retrieved records are sent to the language model.</small></div></div>
+            <div class="flow-step"><div class="num">04</div><div><strong>Generated answer</strong><small>The model answers with [S1], [S2] citations that map to source cards.</small></div></div>
+          </div>
+        </section>
+
+        <section class="side-card glass">
+          <h3>YOU CAN ASK:</h3>
+          
+          <div class="chips">
+            <button class="chip">What is IEEE RAS at VIT Chennai?</button>
+            <button class="chip">What happened at HackVerse 2026?</button>
+            <button class="chip">Why do students join IEEE at VIT Chennai?</button>
+            <button class="chip">What robotics topics has RAS covered historically?</button>
+          </div>
+          
+        </section>
+      </aside>
+    </main>
+
+    
+  </div>
+
+  <script>
+    const form = document.getElementById('chatForm');
+    const input = document.getElementById('question');
+    const messages = document.getElementById('messages');
+    const sendBtn = document.getElementById('sendBtn');
+    const modeLabel = document.getElementById('modeLabel');
+
+    document.querySelectorAll('.chip').forEach(button => {
+      button.addEventListener('click', () => {
+        input.value = button.textContent;
+        input.focus();
+      });
+    });
+
+    function scrollBottom() {
+      messages.scrollTo({ top: messages.scrollHeight, behavior: 'smooth' });
+    }
+
+    function escapeText(text) {
+      const div = document.createElement('div');
+      div.textContent = text;
+      return div.innerHTML;
+    }
+
+    function linkifyCitations(text) {
+      return escapeText(text).replace(/\[S(\d+)\]/g, '<span style="color:#58f0dc;font-weight:800">[S$1]</span>');
+    }
+
+    function addUserMessage(text) {
+      const wrap = document.createElement('div');
+      wrap.className = 'message user';
+      wrap.innerHTML = `<div class="avatar">You</div><div><div class="bubble">${escapeText(text)}</div></div>`;
+      messages.appendChild(wrap);
+      scrollBottom();
+    }
+
+    function addTyping() {
+      const wrap = document.createElement('div');
+      wrap.className = 'message bot';
+      wrap.id = 'typingMessage';
+      wrap.innerHTML = `<div class="avatar">R</div><div><div class="bubble"><span class="typing"><i></i><i></i><i></i></span></div></div>`;
+      messages.appendChild(wrap);
+      scrollBottom();
+    }
+
+    function addBotMessage(data) {
+      document.getElementById('typingMessage')?.remove();
+      const wrap = document.createElement('div');
+      wrap.className = 'message bot';
+      const content = document.createElement('div');
+      content.innerHTML = `<div class="bubble">${linkifyCitations(data.answer || 'No answer returned.')}</div>`;
+
+      if (Array.isArray(data.sources) && data.sources.length) {
+        const sourceWrap = document.createElement('div');
+        sourceWrap.className = 'source-wrap';
+        data.sources.forEach(source => {
+          const a = document.createElement('a');
+          a.className = 'source-card';
+          a.href = source.url;
+          a.target = '_blank';
+          a.rel = 'noopener noreferrer';
+          a.innerHTML = `<span class="source-id">${escapeText(source.id)}</span><span class="source-copy"><strong>${escapeText(source.title)}</strong><small>${escapeText(source.source)} · relevance ${escapeText(String(source.score))}</small></span>`;
+          sourceWrap.appendChild(a);
+        });
+        content.appendChild(sourceWrap);
+      }
+
+      const trace = document.createElement('div');
+      trace.className = 'trace';
+      trace.textContent = `RAG trace · ${data.retrieval?.method || 'retrieval'} · ${data.retrieval?.matched ?? 0} records supplied to model`;
+      content.appendChild(trace);
+
+      wrap.innerHTML = '<div class="avatar">R</div>';
+      wrap.appendChild(content);
+      messages.appendChild(wrap);
+      modeLabel.textContent = data.mode === 'retrieval-only' ? 'Retrieval-only mode' : 'RAG answer';
+      scrollBottom();
+    }
+
+    function addError(message) {
+      document.getElementById('typingMessage')?.remove();
+      const wrap = document.createElement('div');
+      wrap.className = 'message bot';
+      wrap.innerHTML = `<div class="avatar">!</div><div><div class="bubble" style="border-color:rgba(255,113,139,.3)">${escapeText(message)}</div></div>`;
+      messages.appendChild(wrap);
+      modeLabel.textContent = 'Error';
+      scrollBottom();
+    }
+
+    form.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      const question = input.value.trim();
+      if (!question || sendBtn.disabled) return;
+
+      addUserMessage(question);
+      input.value = '';
+      sendBtn.disabled = true;
+      modeLabel.textContent = 'Retrieving…';
+      addTyping();
+
+      try {
+        const response = await fetch('/api/chat', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ message: question })
+        });
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.details || data.error || 'Request failed');
+        addBotMessage(data);
+      } catch (error) {
+        addError(`Could not get an answer: ${error.message}`);
+      } finally {
+        sendBtn.disabled = false;
+        input.focus();
+      }
+    });
+  </script>
+</body>
+</html>
